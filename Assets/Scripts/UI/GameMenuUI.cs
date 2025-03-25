@@ -21,12 +21,16 @@ public class GameMenuUI : BaseUI
         GameStartButton.onClick.AddListener(() => { GameManager.Instance.InGameStart(); });
         ExitButton.onClick.AddListener(() =>
         {
-           Application.Quit(); 
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                Application.Quit(); 
+            #endif
         });
     }
 
     private void Update()
     {
-        GoldText.text = ($"Gold : {GameManager.Instance.price}");
+        GoldText.text = ($"골드 : {GameManager.Instance.price}");
     }
 }

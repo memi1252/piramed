@@ -22,6 +22,8 @@ public class Spikes : MonoBehaviour
             if (!isDamage && !timer)
             {
                 animator.SetBool("isPush", true);
+                other.GetComponent<Player>().SpriteRenderer.color = Color.red;
+                StartCoroutine(DamegeColor(other.GetComponent<Player>().SpriteRenderer));
                 StartCoroutine(DamageFalse());
                 isDamage = true;
                 timer = true;
@@ -53,5 +55,11 @@ public class Spikes : MonoBehaviour
     {
         yield return new WaitForSeconds(1.5f);
         animator.SetBool("isPush", false);
+    }
+
+    IEnumerator DamegeColor(SpriteRenderer spriteRenderer)
+    {
+        yield return new WaitForSeconds(0.4f);
+        spriteRenderer.color = Color.white;
     }
 }

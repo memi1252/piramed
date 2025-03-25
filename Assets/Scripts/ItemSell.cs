@@ -12,7 +12,15 @@ public class ItemSell : MonoBehaviour
             ItemManager itemManager = ItemManager.Instance;
             foreach (Item item in itemManager.Inventoryitmes)
             {
-                GameManager.Instance.price += item.itemPrice;
+                if (GameManager.Instance.Coin2X)
+                {
+                    GameManager.Instance.price += item.itemPrice*2;
+                    GameManager.Instance.Coin2X = false;
+                }
+                else
+                {
+                    GameManager.Instance.price += item.itemPrice;
+                }
             }
             itemManager.Inventoryitmes.Clear();
             foreach (var box in GameManager.Instance.NowOpenBoxs)
@@ -25,7 +33,7 @@ public class ItemSell : MonoBehaviour
             }
             itemManager.NowGetItemList.Clear();
             GameManager.Instance.NowOpenBoxs.Clear();
-            GameManager.Instance.ISDungenExit();
+            GameManager.Instance.ISDungenExit(new Vector3(-88, 14, 0));
         }
     }
 }

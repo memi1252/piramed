@@ -12,6 +12,8 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] public int price = 0;
     [SerializeField] public bool isMove = true;
     [SerializeField] public bool GameStart = true;
+    [SerializeField] public bool NotLookEnemy = false;
+    [SerializeField] public bool Coin2X;
     
     [Header("박스")]
     [SerializeField] public List<Box> Boxs;
@@ -25,16 +27,22 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField]
     public GameObject GlobalLight;
     
+    public bool boxWhere = false;
+    
 
     private void Update()
     {
         hp();
         oxygen();
         boxOpen();
+        BoxWhere();
+        SpeedUpTimerUpdate();
     }
     
     public void InGameStart()
     {
+        PlayerOxygen = maxPlayerOxygen;
+        PlayerHealth = maxPlayerHealth;
         StartCoroutine(GameStartCou());
     }
 
@@ -72,18 +80,15 @@ public class GameManager : MonoSingleton<GameManager>
         UIManager.Instance.statusUI.Show();
     }
     
-    public void ISDungenExit()
+    public void ISDungenExit(Vector3 pos)
     {
-        StartCoroutine(DungenExit());
+        StartCoroutine(DungenExit(pos));
     }
     
-    private IEnumerator DungenExit()
+    
+    private IEnumerator DungenExit(Vector3 pos)
     {
-        UIManager.Instance.statusUI.Hide();
-        GameStart = true;
-        isMove = true;
-        PlayerHealth = maxPlayerHealth;
-        PlayerOxygen = maxPlayerOxygen;
+        
         Light2D playerLight2D = Player.GetComponent<Light2D>();
         
         while (playerLight2D.intensity >= 0)
@@ -108,6 +113,10 @@ public class GameManager : MonoSingleton<GameManager>
         playerLight2D.enabled = false;
         GlobalLight.SetActive(true);
         UIManager.Instance.gameMenuUI.Show();
+        if(UIManager.Instance.inventoryUI.gameObject.activeSelf)
+        {
+            UIManager.Instance.inventoryUI.Hide();
+        }
     }
     
     private void boxOpen()
@@ -127,6 +136,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void hp()
     {
+        
         ItemManager itemManager = ItemManager.Instance;
         if (PlayerHealth > maxPlayerHealth)
         {
@@ -135,7 +145,12 @@ public class GameManager : MonoSingleton<GameManager>
         
         if (PlayerHealth <= 0)
         {
-            ISDungenExit();
+            UIManager.Instance.statusUI.Hide();
+            GameStart = false;
+            isMove = false;
+            PlayerHealth = maxPlayerHealth;
+            PlayerOxygen = maxPlayerOxygen;
+            ISDungenExit(new Vector3(-88, 14, 0));
             itemManager.Inventoryitmes.Clear();
             foreach (Item item in itemManager.NowGetItemList)
             {
@@ -174,7 +189,12 @@ public class GameManager : MonoSingleton<GameManager>
 
         if (PlayerOxygen <= 0)
         {
-            ISDungenExit();
+            UIManager.Instance.statusUI.Hide();
+            GameStart = false;
+            isMove = false;
+            PlayerHealth = maxPlayerHealth;
+            PlayerOxygen = maxPlayerOxygen;
+            ISDungenExit(new Vector3(-88, 14, 0));
             itemManager.Inventoryitmes.Clear();
             foreach (Item item in itemManager.NowGetItemList)
             {
@@ -197,4 +217,57 @@ public class GameManager : MonoSingleton<GameManager>
             NowOpenBoxs.Clear();
         }
     }
+    private int Boxindex;
+    private float boxdistance;
+    private void BoxWhere()
+    {
+        if(boxWhere)
+        {
+            UIManager.Instance.statusUI.BoxWhereText.gameObject.SetActive(true);
+            if (Boxindex == -1)
+            {
+                Boxindex = UnityEngine.Random.Range(0, Boxs.Count);
+                while (Boxs[Boxindex].buffItem)
+                {
+                    Boxindex = UnityEngine.Random.Range(0, Boxs.Count);
+                }
+            }
+            boxdistance = Vector3.Distance(Player.transform.position, Boxs[Boxindex].transform.position);
+            UIManager.Instance.statusUI.BoxWhereText.text = $"상자까지 거리 {(int) boxdistance}m";
+        }
+        else
+        {
+            UIManager.Instance.statusUI.BoxWhereText.gameObject.SetActive(false);
+            boxdistance = 0;
+            Boxindex = -1;
+        }
+    }
+
+    private float SpeedUpmaxTimeer = 0;
+    private float SpeedUTimer = 0;
+    public float SpeedUpSpeed = 0;
+    public bool SpeedUpOn = false;
+    public void SpeedUp(float speed, float maxTime)
+    {
+        SpeedUpmaxTimeer = maxTime;
+        SpeedUpSpeed = speed;
+        Player.Movespeed += speed;
+        SpeedUpOn = true;
+    }
+
+    private void SpeedUpTimerUpdate()
+    {
+        if (SpeedUpOn)
+        {
+            SpeedUTimer += Time.deltaTime;
+            if (SpeedUTimer >= SpeedUpmaxTimeer)
+            {
+                Player.Movespeed -= SpeedUpSpeed;
+                SpeedUTimer = 0;
+                SpeedUpSpeed = 0;
+                SpeedUpOn = false;
+            }
+        }
+    }
+    
 }

@@ -17,12 +17,12 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] public Color Color;
  
     private Image image;
-    private TextMeshProUGUI Text;
+    private Text Text;
 
     private void Awake()
     {
         image = GetComponent<Image>();
-        Text = GetComponentInChildren<TextMeshProUGUI>();
+        Text = GetComponentInChildren<Text>();
     }
 
     private void Start()

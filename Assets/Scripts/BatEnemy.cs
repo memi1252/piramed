@@ -38,13 +38,14 @@ public class BatEnemy : EnemyBase
     public override void TakeDamage(int damage)
     {
         base.TakeDamage(damage);
-        BatAnimator.SetBool("Hit", true);
+        BatAnimator.SetTrigger("Hit");
+        SpriteRenderer.color = Color.red;
         StartCoroutine(Hitfalse());
     }
     
     IEnumerator Hitfalse()
     {
         yield return new WaitForSeconds(0.5f);
-        BatAnimator.SetBool("Hit", false);
+        SpriteRenderer.color = Color.white;
     }
 }

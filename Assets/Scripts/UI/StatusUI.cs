@@ -10,11 +10,13 @@ public class StatusUI : BaseUI
     [SerializeField] private Slider hpSlider;
     [SerializeField] private Slider oxygenSlider;
     [SerializeField] private Text GoldText;
+    [SerializeField] public Text BoxWhereText;
 
 
     private void Awake()
     {
         Hide();
+        BoxWhereText.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -30,6 +32,6 @@ public class StatusUI : BaseUI
 
     private void GoldUpdate()
     {
-        GoldText.text = ($"Gold : {GameManager.Instance.price}");
+        GoldText.text = ($"골드 : {GameManager.Instance.price}");
     }
 }

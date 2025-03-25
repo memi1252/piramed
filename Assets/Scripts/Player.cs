@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private float Movespeed = 5f;
+    [SerializeField] public float Movespeed = 5f;
     [SerializeField] private GameObject playerBody;
     [SerializeField] private GameObject nife;
     [SerializeField] private float WallCheckDistance = 0.1f;
@@ -18,7 +18,7 @@ public class Player : MonoBehaviour
     
     private Animator PlayerAnimator;
     private Animator NifeAnimator;
-    private SpriteRenderer SpriteRenderer;
+    public SpriteRenderer SpriteRenderer;
 
     private void Awake()
     {
@@ -34,12 +34,17 @@ public class Player : MonoBehaviour
         BoxOpen();
     }
 
+    private float h;
+    private float v;
+    
+    Vector2 dir = new Vector2(0, 0);
+
     private void Move()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        h = Input.GetAxis("Horizontal");
+        v = Input.GetAxis("Vertical");
         
-        Vector2 dir = new Vector2(h, v);
+        dir.Set(h,v);
         
         WallCheck(dir);
         
@@ -73,10 +78,12 @@ public class Player : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1") && GameManager.Instance.GameStart)
         {
+            if(NifeAnimator.GetBool("Attack")) return;
+            
             NifeAnimator.SetBool("Attack", true);
             if(SpriteRenderer.flipX)
             {
-                RaycastHit2D hit = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0, Vector2.left, AttackDistance, EnemyAndMos);
+                RaycastHit2D hit = Physics2D.BoxCast(transform.position, Vector2.one * 0.5f, 0, Vector2.left, AttackDistance, EnemyAndMos);
                 if(hit)
                 {
                     if (hit.transform.gameObject.layer == 7)
@@ -93,7 +100,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                RaycastHit2D hit = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0, Vector2.right, AttackDistance, EnemyAndMos);
+                RaycastHit2D hit = Physics2D.BoxCast(transform.position, Vector2.one * 0.5f, 0, Vector2.right, AttackDistance, EnemyAndMos);
                 if(hit)
                 {
                     if (hit.transform.gameObject.layer == 7)
@@ -113,12 +120,16 @@ public class Player : MonoBehaviour
         }
     }
 
+    private bool hitRight;
+    private bool hitLeft;
+    private bool hitUp;
+    private bool hitDown;
     private void WallCheck(Vector2 dir)
     {
-        bool hitRight = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0, Vector2.right, WallCheckDistance, WallAndMos);
-        bool hitLeft = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0, Vector2.left, WallCheckDistance, WallAndMos);
-        bool hitUp = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0, Vector2.up, WallCheckDistance, WallAndMos);
-        bool hitDown = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.5f), 0, Vector2.down, WallCheckDistance, WallAndMos);
+        hitRight = Physics2D.BoxCast(transform.position, Vector2.one * 0.5f, 0, Vector2.right, WallCheckDistance, WallAndMos);
+        hitLeft = Physics2D.BoxCast(transform.position, Vector2.one * 0.5f, 0, Vector2.left, WallCheckDistance, WallAndMos);
+        hitUp = Physics2D.BoxCast(transform.position, Vector2.one * 0.5f, 0, Vector2.up, WallCheckDistance, WallAndMos);
+        hitDown = Physics2D.BoxCast(transform.position, Vector2.one * 0.5f, 0, Vector2.down, WallCheckDistance, WallAndMos);
 
         if ((hitRight && dir.x > 0) || (hitLeft && dir.x < 0) || (hitUp && dir.y > 0) || (hitDown && dir.y < 0))
         {
@@ -132,6 +143,7 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        #if UNITY_EDITOR
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(transform.position + Vector3.right *WallCheckDistance, new Vector3(0.5f, 0.5f, 0));
         Gizmos.DrawWireCube(transform.position + Vector3.left *WallCheckDistance, new Vector3(0.5f, 0.5f, 0));
@@ -144,6 +156,7 @@ public class Player : MonoBehaviour
         
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, BoxOpenDistance);
+        #endif
     }
     
     public void TakeDamage(int damage)
@@ -160,10 +173,15 @@ public class Player : MonoBehaviour
                 float distance = Vector2.Distance(transform.position, box.transform.position);
                 if (distance < BoxOpenDistance)
                 {
+                    if (GameManager.Instance.boxWhere)
+                    {
+                        GameManager.Instance.boxWhere = false;
+                    }
                     Animator boxAnim = box.GetComponent<Animator>();
                     boxAnim.SetBool("BoxOpen", true);
                     Box boxScript = box.GetComponent<Box>();
                     boxScript.OpenBox();
+                    
                 }
             }
         }

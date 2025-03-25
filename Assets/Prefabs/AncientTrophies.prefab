@@ -97,9 +97,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 800ddf78093019a4bb48a44cc06f32ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemName: AncientTrophies
+  itemName: "\uACE0\uB300 \uD2B8\uB85C\uD53C"
   itemSprite: {fileID: 1151381906, guid: b631ed305dfd43c488e0f8edf5c829bc, type: 3}
-  itemDescription: OldAncientTrophies
+  itemDescription: "\uB3C8\uC880 \uB420\uAC70 \uAC19\uB2E4"
   itemPrice: 1000
   itemCount: 1
   Color: {r: 1, g: 1, b: 1, a: 1}
