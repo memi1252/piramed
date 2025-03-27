@@ -27,6 +27,10 @@ public class GameMenuUI : BaseUI
                 Application.Quit(); 
             #endif
         });
+        ShopButton.onClick.AddListener(() =>
+        {
+            UIManager.Instance.shopUI.Show();
+        });
     }
 
     private void Update()

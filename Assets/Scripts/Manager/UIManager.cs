@@ -8,6 +8,7 @@ public class UIManager : MonoSingleton<UIManager>
     [SerializeField] public InventoryUI inventoryUI;
     [SerializeField] public StatusUI statusUI;
     [SerializeField] public GameMenuUI gameMenuUI;
+    [SerializeField] public ShopUI shopUI;
 
 
     private void Update()
